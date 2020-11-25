@@ -13,22 +13,25 @@
 class Button {
     private:
         DigitalIn _mbedDigitalIn;
-        Callback<void(Button*)> _callback;
+
+        Callback<void(Button*)> _onButtonPressed;
+        Callback<void(Button*)> _onButtonReleased;
+
         string _id;
         bool _wasPressed;
 
         inline static std::vector<Button*> _managedButtons = std::vector<Button*>();
 
     public:
-        Button(PinName pin, Callback<void(Button*)> callback, string id) : _mbedDigitalIn(pin, PullUp), _callback(callback), _id(id), _wasPressed(false) {};
+        Button(PinName pin, Callback<void(Button*)> callback, string id) : _mbedDigitalIn(pin, PullUp), _onButtonPressed(callback), _id(id), _wasPressed(false) {};
 
         DigitalIn getMbedDigitalIn() {
             return _mbedDigitalIn;
         }
 
-        Callback<void(Button*)> getCallback() {
-            return _callback;
-        }
+        void setOnButtonPressed(Callback<void(Button*)> callback);
+
+        void setOnButtonReleased(Callback<void(Button*)> callback);
 
         string getId() {
             return _id;
