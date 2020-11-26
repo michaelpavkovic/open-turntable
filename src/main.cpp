@@ -79,11 +79,11 @@ int main() {
 	Timer timer2;
 	
 	timer.start();
-	timer.start();
+	timer2.start();
 	
 	int lednum = 0;
 	rgb_color colors[LED_COUNT];
-	
+
 	std::cout << "[INFO] Starting..." << std::endl;
 
 	midi.attach(onMidiMessageReceived);
