@@ -21,6 +21,9 @@ class QuadratureEncoder {
         volatile int _currentState;
         volatile int _ticks;
 
+        // Callback for tick change
+        Callback<void(int)> _onTicksChanged;
+
         void processStateChange();
 
     public:
@@ -35,6 +38,8 @@ class QuadratureEncoder {
         double getRevolutions();
 
         int getWholeRevolutions();
+
+        void setOnTicksChanged(Callback<void(int)> callback);
 };
 
 #endif

@@ -31,8 +31,16 @@ void QuadratureEncoder::processStateChange() {
     // If it rotates counter-clockwise(negative), gives 1
     if (STATE_RIGHT(_previousState) ^ STATE_LEFT(_currentState)) {
         _ticks -= 1;
+
+        if (this->_onTicksChanged != nullptr) {
+            this->_onTicksChanged(_ticks);
+        }
     } else {
         _ticks += 1;
+
+        if (this->_onTicksChanged != nullptr) {
+            this->_onTicksChanged(_ticks);
+        }
     }
 
     _previousState = _currentState;
@@ -56,4 +64,8 @@ double QuadratureEncoder::getRevolutions() {
 
 int QuadratureEncoder::getWholeRevolutions() {
     return (int) this->getRevolutions();
+}
+
+void QuadratureEncoder::setOnTicksChanged(Callback<void(int)> callback) {
+    this->_onTicksChanged = callback;
 }

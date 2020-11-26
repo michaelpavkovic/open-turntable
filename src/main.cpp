@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 #include <string>
 
@@ -27,9 +28,9 @@ void onMidiMessageReceived() {
 void onCueButtonPressed(Button* b) {
 	cueLed = !cueLed;
 
-	// std::cout << "Tempo slider:  " << (int) tempoSliderAverage.getAverage() << std::endl;
-	// std::cout << "Volume slider: " << (int) volumeSliderAverage.getAverage() << std::endl;
-	// std::cout << "Encoder ticks: " << encoder.getTicks() << std::endl << std::endl;
+	std::cout << "Tempo slider:  " << (int) tempoSliderAverage.getAverage() << std::endl;
+	std::cout << "Volume slider: " << (int) volumeSliderAverage.getAverage() << std::endl;
+	std::cout << "Encoder ticks: " << encoder.getTicks() << std::endl << std::endl;
 
 	midi.write(MIDIMessage::NoteOn(0x0C));
 }
@@ -43,6 +44,8 @@ void onPlayButtonPress(Button* b) {
 
 	midi.write(MIDIMessage::NoteOn(0x0B));
 }
+
+float previousTicks = 0;
 
 int main() {
 	std::cout << "[INFO] Starting..." << std::endl;
@@ -61,8 +64,22 @@ int main() {
 	AnalogIn volumeSlider(p20);
 
     while (true) {
+		float ticks = -encoder.getTicks();
+		int delta = (int) (ticks - previousTicks);
+		if (abs(delta) >= 10) {
+			if (delta >= 1) {
+				midi.write(MIDIMessage::ControlChange(0x21, delta + 64));
+
+				std::cout << delta << std::endl;
+			} else if (delta <= -1) {
+				midi.write(MIDIMessage::ControlChange(0x21, delta + 64));
+			}
+
+			previousTicks = ticks;
+		}
+
 		Button::watchManagedButtons();
-		tempoSliderAverage.add((int) (tempoSlider.read() * 13000.0 - 10.0));
-		volumeSliderAverage.add((int) (volumeSlider.read() * 13000.0 - 10.0));
+		tempoSliderAverage.add((int) (tempoSlider.read() * 3000.0));
+		volumeSliderAverage.add((int) (volumeSlider.read() * 3000.0));
     }    
 }

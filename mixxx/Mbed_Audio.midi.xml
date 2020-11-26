@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='utf-8'?>
+<MixxxControllerPreset mixxxVersion="1.11+" schemaVersion="1">
+    <info>
+        <name>Open Turntable</name>
+        <author>Thomas Niedzwiadek and Michael Pavkovic</author>
+        <description>Open Turntable Mixxx bindings</description>
+    </info>
+    <controller id="Mbed">
+        <scriptfiles>
+            <file functionprefix="OpenTurntable" filename="open-turntable-scripts.js"/>
+        </scriptfiles>
+        <controls>
+            <control>
+                <group>[Channel1]</group>
+                <key>cue_default</key>
+                <description>Cue</description>
+                <status>0x90</status>
+                <midino>0x0C</midino>
+                <options>
+                    <normal/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>OpenTurntable.wheelTurn</key>
+                <description>Wheel Turn Positive</description>
+                <status>0xB0</status>
+                <midino>0x21</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>play</key>
+                <description>Play</description>
+                <status>0x90</status>
+                <midino>0x0B</midino>
+                <options>
+                    <normal/>
+                </options>
+            </control>
+        </controls>
+        <outputs/>
+    </controller>
+</MixxxControllerPreset>
