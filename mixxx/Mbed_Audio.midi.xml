@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<MixxxControllerPreset mixxxVersion="1.11+" schemaVersion="1">
+<MixxxControllerPreset schemaVersion="1" mixxxVersion="1.11+">
     <info>
         <name>Open Turntable</name>
         <author>Thomas Niedzwiadek and Michael Pavkovic</author>
@@ -7,9 +7,39 @@
     </info>
     <controller id="Mbed">
         <scriptfiles>
-            <file functionprefix="OpenTurntable" filename="open-turntable-scripts.js"/>
+            <file filename="open-turntable-scripts.js" functionprefix="OpenTurntable"/>
         </scriptfiles>
         <controls>
+            <control>
+                <group>[Channel1]</group>
+                <key>play</key>
+                <description>Play</description>
+                <status>0x90</status>
+                <midino>0x0B</midino>
+                <options>
+                    <normal/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>rate</key>
+                <description>Rate</description>
+                <status>0xB0</status>
+                <midino>0x19</midino>
+                <options>
+                    <normal/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>crossfader</key>
+                <description>Crossfader</description>
+                <status>0xB0</status>
+                <midino>0x19</midino>
+                <options>
+                    <normal/>
+                </options>
+            </control>
             <control>
                 <group>[Channel1]</group>
                 <key>cue_default</key>
@@ -28,16 +58,6 @@
                 <midino>0x21</midino>
                 <options>
                     <script-binding/>
-                </options>
-            </control>
-            <control>
-                <group>[Channel1]</group>
-                <key>play</key>
-                <description>Play</description>
-                <status>0x90</status>
-                <midino>0x0B</midino>
-                <options>
-                    <normal/>
                 </options>
             </control>
         </controls>
