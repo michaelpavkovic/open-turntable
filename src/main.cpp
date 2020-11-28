@@ -116,8 +116,6 @@ int main() {
 	offsetTimer.start();
 
 	Button* cueButton = new Button(p17, onCueButtonPressed, "CueButton");
-	cueButton->setOnButtonReleased(onCueButtonReleased);
-
 	Button* playButton = new Button(p18, onPlayButtonPress, "PlayButton");
 
 	Button::addManagedButton(cueButton);
@@ -151,7 +149,7 @@ int main() {
 		tempoSliderAverage.add(currentTempo);
 		
 		int currentVolume = CLAMP((int) (volumeSlider.read() * 1600.0), 0, 32);
-		tempoSliderAverage.add(currentVolume);
+		volumeSliderAverage.add(currentVolume);
 
 		// Send tempo and volume values if they have changed
 		int tempo = tempoSliderAverage.getAverage();
