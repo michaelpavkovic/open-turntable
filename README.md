@@ -1,5 +1,5 @@
 # Open Turntable
-This is the codebase for my UMass CS335 final project: an open source digital turntable. It is intended to be used with [Mixxx](https://mixxx.org/), which handles audio playback. MIDI commands are sent over the LPC1768's secondary USB data line. Mixxx processes them and turns them into play/pause, cue, jog wheel adjust, volume adjust, and tempo adjust commands.
+This is the codebase for our UMass CS335 final project: an open source digital turntable. It is intended to be used with [Mixxx](https://mixxx.org/), which handles audio playback. MIDI commands are sent over the LPC1768's secondary USB data line. Mixxx processes them and turns them into play/pause, cue, jog wheel adjust, volume adjust, and tempo adjust commands.
 
 
 ## How to Build
