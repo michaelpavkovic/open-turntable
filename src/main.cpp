@@ -11,6 +11,7 @@
 
 #define LED_COUNT 16
 #define BRIGHTNESS 30
+#define CLAMP(v, l, h) min(h, max(v, l))
 
 const int TICKS_PER_REV = 600 * 4;
 
@@ -24,7 +25,6 @@ RollingAverage tempoSliderAverage(32);
 RollingAverage volumeSliderAverage(32);
 
 MIDIMessage receivedMessage;
-int lednum = 0;
 void onMidiMessageReceived() {
 	if (midi.read(&receivedMessage)) {
 		if (receivedMessage.data[1] == 0x90 && receivedMessage.data[2] == 0x0C) {
@@ -45,13 +45,7 @@ void onCueButtonPressed(Button* b) {
 	midi.write(MIDIMessage::NoteOn(0x0C));
 }
 
-void onCueButtonReleased(Button* b) {
-	// midi.write(MIDIMessage::NoteOn(0x0C));
-}
-
 void onPlayButtonPress(Button* b) {
-	// playLed = !playLed;
-
 	midi.write(MIDIMessage::NoteOn(0x0B));
 }
 
@@ -77,20 +71,26 @@ rgb_color hsvToRgb(float h, float s, float v)
         case 4: r = t; g = p; b = v; break;
         case 5: r = v; g = p; b = q; break;
     }
-    return (rgb_color) {r * BRIGHTNESS, g * BRIGHTNESS, b * BRIGHTNESS};
+    return (rgb_color) {
+		(std::uint8_t) (r * BRIGHTNESS), 
+		(std::uint8_t) (g * BRIGHTNESS), 
+		(std::uint8_t) (b * BRIGHTNESS)
+	};
 }
 
 Timer timer;
-Timer timer2;
+Timer offsetTimer;
 rgb_color colors[LED_COUNT];
+int neoPixelNumber = 0;
+int neoPixelOffset = 0;
 
 void updateNeoPixelRing() {
 	uint32_t time = timer.read_ms();       
 	for (int i = 0; i < LED_COUNT; i++)
 	{
 	    uint8_t phase = (time >> 4) - (i << 2);
-	    if (i == lednum) {
-	        colors[lednum] = (rgb_color){0,0,0};    
+	    if (i == neoPixelNumber) {
+	        colors[neoPixelNumber] = (rgb_color){0,0,0};    
 	    } else {
 	        colors[i] = hsvToRgb(phase / 256.0, 1.0, 1.0);
 	    }
@@ -99,11 +99,11 @@ void updateNeoPixelRing() {
 	// Send the colors to the LED strip.
 	ledStrip.write(colors, LED_COUNT);
 
-	//This currently manually updates the lednum on a one second timer
-	if (timer2.read() >= 1) {
-	    lednum++;
-	    lednum = lednum%16;
-	    timer2.reset();
+	// This currently manually updates the neoPixelNumber on a one second timer
+	if (offsetTimer.read_ms() >= 225) {
+	    neoPixelOffset++;
+	    neoPixelNumber %= 16;
+	    offsetTimer.reset();
 	}
 }
 
@@ -113,7 +113,7 @@ int main() {
 	midi.attach(onMidiMessageReceived);
 
 	timer.start();
-	timer2.start();
+	offsetTimer.start();
 
 	Button* cueButton = new Button(p17, onCueButtonPressed, "CueButton");
 	cueButton->setOnButtonReleased(onCueButtonReleased);
@@ -132,6 +132,8 @@ int main() {
 
 		// Only send ticks delta if it is greater than 32 to limit the number of midi messages sent
 		if (abs(delta) >= 32) {
+			neoPixelOffset = 0; // Reset offset to stop auto movement of NeoPixels
+			
 			if (delta >= 1) {
 				midi.write(MIDIMessage::ControlChange(0x21, delta + 64));
 			} else if (delta <= -1) {
@@ -141,21 +143,26 @@ int main() {
 			previousTicks = ticks;
 		}
 
+		neoPixelNumber = ((int) abs(ticks) % TICKS_PER_REV / 150 + neoPixelOffset) % 16;
+
 		Button::watchManagedButtons();
 
-		tempoSliderAverage.add(min((int) (tempoSlider.read() * 1000000.0), 4));
-		volumeSliderAverage.add(min((int) (volumeSlider.read() * 1000000.0), 4));
+		int currentTempo = CLAMP((int) (tempoSlider.read() * 1600.0), 0, 32);
+		tempoSliderAverage.add(currentTempo);
+		
+		int currentVolume = CLAMP((int) (volumeSlider.read() * 1600.0), 0, 32);
+		tempoSliderAverage.add(currentVolume);
 
 		// Send tempo and volume values if they have changed
 		int tempo = tempoSliderAverage.getAverage();
 		int volume = volumeSliderAverage.getAverage();
 
 		if (tempo != previousTempo) {
-			midi.write(MIDIMessage::ControlChange(0x19, tempo * 32));
+			midi.write(MIDIMessage::ControlChange(0x19, CLAMP(tempo * 4, 0, 127)));
 			previousTempo = tempo;
 		}
 		if (volume != previousVolume) {
-			midi.write(MIDIMessage::ControlChange(0x20, volume * 32));
+			midi.write(MIDIMessage::ControlChange(0x20, CLAMP(volume * 4, 0, 127)));
 			previousVolume = volume;
 		}
 

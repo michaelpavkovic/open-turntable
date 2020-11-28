@@ -17,6 +17,8 @@ class RollingAverage {
 
         float getAverage();
 
+        float getLast();
+
         void add(const float value);
 };
 

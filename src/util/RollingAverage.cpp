@@ -21,3 +21,11 @@ void RollingAverage::add(const float value) {
 
     _storage.push_back(value);
 }
+
+float RollingAverage::getLast() {
+    if (_storage.size() > 0) {
+        return _storage[_storage.size() - 1];
+    }
+
+    return 0.0;
+}
