@@ -25,16 +25,17 @@ RollingAverage tempoSliderAverage(32);
 RollingAverage volumeSliderAverage(32);
 
 MIDIMessage receivedMessage;
+bool playing = false;
 void onMidiMessageReceived() {
-	if (midi.read(&receivedMessage)) {
-		if (receivedMessage.data[1] == 0x90 && receivedMessage.data[2] == 0x0C) {
-			cueLed = receivedMessage.data[3];
-		} else if (receivedMessage.data[1] == 0x90 && receivedMessage.data[2] == 0x0B) {
-			playLed = receivedMessage.data[3];
-		} else if (receivedMessage.data[1] == 0x90 && receivedMessage.data[2] == 0x0B) {
-			
-		}
-	}
+    if (midi.read(&receivedMessage)) {
+        if (receivedMessage.data[1] == 0x90 && receivedMessage.data[2] == 0x0C) {
+            cueLed = receivedMessage.data[3];
+        } else if (receivedMessage.data[1] == 0x90 && receivedMessage.data[2] == 0x0B) {
+            playLed = receivedMessage.data[3];
+        } else if (receivedMessage.data[1] == 0x90 && receivedMessage.data[2] == 0x0D) {
+            playing = receivedMessage.data[3];
+        }
+    }
 }
 
 void onCueButtonPressed(Button* b) {
@@ -100,7 +101,7 @@ void updateNeoPixelRing() {
 	ledStrip.write(colors, LED_COUNT);
 
 	// This currently manually updates the neoPixelNumber on a one second timer
-	if (offsetTimer.read_ms() >= 225) {
+	if (playing && offsetTimer.read_ms() >= 225) {
 	    neoPixelOffset++;
 	    neoPixelNumber %= 16;
 	    offsetTimer.reset();
@@ -130,8 +131,6 @@ int main() {
 
 		// Only send ticks delta if it is greater than 32 to limit the number of midi messages sent
 		if (abs(delta) >= 32) {
-			neoPixelOffset = 0; // Reset offset to stop auto movement of NeoPixels
-			
 			if (delta >= 1) {
 				midi.write(MIDIMessage::ControlChange(0x21, delta + 64));
 			} else if (delta <= -1) {

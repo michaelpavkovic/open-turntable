@@ -22,6 +22,11 @@ var playIndicatorCallback = function(value, group, control) {
 };
 var playIndicatorConnection = engine.makeConnection('[Channel1]', 'play_indicator', playIndicatorCallback);
 
+var playCallback = function(value, group, control) {
+    midi.sendShortMsg(0x90, 0x0D, value * 0x7F);
+};
+var playConnection = engine.makeConnection('[Channel1]', 'play', playCallback);
+
 // engine.beginTimer(100, function() {
 //     midi.sendShortMsg(0x90, 0x0D, engine.getValue('[Channel1]', playposition))
 // });
