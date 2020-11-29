@@ -31,7 +31,7 @@
                 </options>
             </control>
             <control>
-                <group>[Channel1]</group>
+                <group>[Master]</group>
                 <key>crossfader</key>
                 <description>Crossfader</description>
                 <status>0xB0</status>
